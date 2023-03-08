@@ -1,34 +1,14 @@
-# import os
-# import http.server
-# import socketserver
+from flask import Flask, request
+import requests
 
-# from http import HTTPStatus
+app = Flask(__name__)
 
-
-# class Handler(http.server.SimpleHTTPRequestHandler):
-#     def do_GET(self):
-#         self.send_response(HTTPStatus.OK)
-#         self.end_headers()
-#         msg = 'Hello! you requested %s' % (self.path)
-#         self.wfile.write(msg.encode())
-
-
-# port = int(os.getenv('PORT', 80))
-# print('Listening on port %s' % (port))
-# httpd = socketserver.TCPServer(('', port), Handler)
-# httpd.serve_forever()
-from aiohttp import web
-
-async def handle_request(request):
-    url = request.url.with_scheme("https").with_host("archnet.coloringco.com.au")
-    new_request = request.clone(rel_url=url)
-    async with aiohttp.ClientSession() as session:
-        async with session.request(method=new_request.method, url=new_request.url, headers=new_request.headers) as response:
-            headers = {key.lower(): value for key, value in response.headers.items()}
-            body = await response.read()
-            return web.Response(body=body, status=response.status, headers=headers)
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def proxy(path):
+    url = 'https://fra.bornatejaratdeba.com/' + path
+    response = requests.get(url, params=request.args)
+    return response.content, response.status_code
 
 if __name__ == '__main__':
-    app = web.Application()
-    app.router.add_route('*', '/{tail:.*}', handle_request)
-    web.run_app(app)
+    app.run(host='0.0.0.0', port=80)
