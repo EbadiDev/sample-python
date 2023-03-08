@@ -17,4 +17,4 @@ def fetch_listener(event):
                            cert=event.request.cert)
     return fetch(new_request)
 
-add_event_listener("fetch", fetch_listener)
+self.addEventListener("fetch", fetch_listener)
